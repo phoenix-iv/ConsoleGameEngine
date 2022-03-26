@@ -1,4 +1,6 @@
-﻿namespace ConsoleGameEngine.Graphics
+﻿using ConsoleGameEngine.Components;
+
+namespace ConsoleGameEngine.Graphics
 {
     /// <summary>
     /// Represents a texture atlas that defines frame locations within an image.
@@ -13,8 +15,25 @@
         /// The image that contains the frames.
         /// </summary>
         public Image Image { get; set; } = new Image();
+
+        /// <summary>
+        /// Calculates the clipping information for the specified texture atlas and frame name.
+        /// </summary>
+        /// <param name="frameName">The frame name.</param>
+        /// <returns>The clipping information.</returns>
+        public ClippingInfo CalculateClipping(string frameName)
+        {
+            TextureAtlasFrame frame = Frames.First(f => f.FileName == frameName);
+            return new ClippingInfo
+            {
+                X = frame.Frame.X,
+                Y = frame.Frame.Y,
+                Width = frame.Frame.W,
+                Height = frame.Frame.H
+            };
+        }
     }
-    
+
     /// <summary>
     /// Represents a frame definition within a texture atlas.
     /// </summary>

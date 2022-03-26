@@ -33,5 +33,9 @@
         /// The number of times the animation has been repeated.
         /// </summary>
         public int RepeatedCount;
+        /// <summary>
+        /// Whether or not the animation has been requested to stop.
+        /// </summary>
+        public bool IsStopped;
     }
 }

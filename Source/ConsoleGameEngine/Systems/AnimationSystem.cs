@@ -31,10 +31,17 @@ namespace ConsoleGameEngine.Systems
         {
             ref var animation = ref entity.Get<Animation>();
             var identifier = entity.Get<EntityIdentifier>();
-            int framesToAdvance = (int)(time.Total - animation.LastFrameTime).TotalSeconds * animation.FramesPerSecond;
+            
+            if (animation.IsStopped)
+            {
+                return;
+            }
 
+            int framesToAdvance = (int)((time.Total - animation.LastFrameTime).TotalSeconds * animation.FramesPerSecond);
+            
             if (framesToAdvance > 0)
             {
+                animation.LastFrameTime = time.Total;
                 animation.FrameIndex += framesToAdvance;
                 if (animation.FrameIndex > animation.Frames.Length - 1)
                 {
@@ -49,6 +56,7 @@ namespace ConsoleGameEngine.Systems
                         return;
                     }
                 }
+
                 AnimationFrame frame = animation.Frames[animation.FrameIndex];
                 entity.Set(frame.Image);
                 entity.Set(frame.ClippingInfo);

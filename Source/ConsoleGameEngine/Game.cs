@@ -1,4 +1,5 @@
-﻿using ConsoleGameEngine.Caching;
+﻿using ConsoleGameEngine.Animations;
+using ConsoleGameEngine.Caching;
 
 namespace ConsoleGameEngine
 {
@@ -7,6 +8,10 @@ namespace ConsoleGameEngine
     /// </summary>
     public class Game : IDisposable
     {
+        /// <summary>
+        /// The global animation manager for the game.
+        /// </summary>
+        public AnimationManager Animations { get; }
         /// <summary>
         /// The global cache manager for the game.
         /// </summary>
@@ -18,7 +23,15 @@ namespace ConsoleGameEngine
         private bool _exitRequested = false;
 
         /// <summary>
-        /// Starts the main game loop.  This is a blocking call and will run until <see cref="Game.Exit"/> is called.
+        /// Creates a new instance of the <see cref="Game"/>.
+        /// </summary>
+        public Game()
+        {
+            Animations = new AnimationManager(Cache);
+        }
+
+        /// <summary>
+        /// Starts the main game loop.  This is a blocking call and will run until <see cref="Exit"/> is called.
         /// </summary>
         public void Start()
         {
@@ -27,6 +40,7 @@ namespace ConsoleGameEngine
             Scene?.Create();
             var startTime = DateTime.Now;
             var lastTime = DateTime.Now;
+
             while(!_exitRequested)
             {
                 TimeSpan delta = DateTime.Now.Subtract(lastTime);

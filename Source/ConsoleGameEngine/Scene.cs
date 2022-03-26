@@ -1,4 +1,5 @@
-﻿using ConsoleGameEngine.Cameras;
+﻿using ConsoleGameEngine.Animations;
+using ConsoleGameEngine.Cameras;
 using ConsoleGameEngine.GameObjects;
 using ConsoleGameEngine.Loading;
 using ConsoleGameEngine.Systems;
@@ -17,9 +18,18 @@ namespace ConsoleGameEngine
         /// </summary>
         public GameObjectFactory Add { get; }
         /// <summary>
+        /// The animation manager for this scene.
+        /// </summary>
+        public AnimationManager Animations { get; }
+        /// <summary>
         /// The scene's camera.
         /// </summary>
         public Camera Camera { get; }
+        private readonly List<GameObject> _children = new();
+        /// <summary>
+        /// The child game objects that are part of this scene.
+        /// </summary>
+        public IReadOnlyList<GameObject> Children => _children;
         /// <summary>
         /// The game that this scene is a part of.
         /// </summary>
@@ -32,11 +42,6 @@ namespace ConsoleGameEngine
         /// The ECS world used to update game state.
         /// </summary>
         public World World { get; }
-        private readonly List<GameObject> _children = new();
-        /// <summary>
-        /// The child game objects that are part of this scene.
-        /// </summary>
-        public IReadOnlyList<GameObject> Children => _children;
 
         private readonly SequentialSystem<GameTime> _system;
 
@@ -48,10 +53,11 @@ namespace ConsoleGameEngine
         {
             World = new World();
             Game = game;
-            Add = new GameObjectFactory(this, game.Cache);
+            Add = new GameObjectFactory(this, game.Animations, game.Cache);
+            Animations = game.Animations;
             Camera = new Camera();
             Load = new Loader(Game.Cache);
-            _system = new SequentialSystem<GameTime>(new RenderSystem(World, Camera));
+            _system = new SequentialSystem<GameTime>(new AnimationSystem(World), new RenderSystem(World, Camera));
         }
 
         /// <summary>

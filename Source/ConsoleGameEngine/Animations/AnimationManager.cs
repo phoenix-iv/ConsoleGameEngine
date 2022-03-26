@@ -28,13 +28,13 @@ namespace ConsoleGameEngine.Animations
         /// <returns>The animation data.</returns>
         /// <exception cref="ArgumentNullException">Occurs when required properties on the configuration are null.</exception>
         /// <exception cref="ArgumentException">Occurs when required configuration data is not set.</exception>
-        public Animation Add(ImageAnimationConfiguration config)
+        public Animation Add(SpritesheetAnimationConfiguration config)
         {
-            if (config.Image == null && config.ImageKey == null && config.Frames.Length == 0)
-                throw new ArgumentNullException(nameof(config), $"Either {nameof(config.Image)}, {nameof(config.ImageKey)} or {nameof(config.Frames)} must be set.");
+            if (config.Spritesheet == null && config.SpritesheetKey == null && config.Frames.Length == 0)
+                throw new ArgumentNullException(nameof(config), $"Either {nameof(config.Spritesheet)}, {nameof(config.SpritesheetKey)} or {nameof(config.Frames)} must be set.");
 
-            if (config.Image == null && config.ImageKey != null)
-                config.Image = _cache.Images.Get(config.ImageKey);
+            if (config.Spritesheet == null && config.SpritesheetKey != null)
+                config.Spritesheet = _cache.Spritesheets.Get(config.SpritesheetKey);
 
             if (config.Frames.Length == 0)
             {
@@ -45,18 +45,19 @@ namespace ConsoleGameEngine.Animations
                     config.FrameIndexes = Enumerable.Range(config.FrameStart, config.FrameCount).ToArray();
                 }
 
-                config.Frames = new ImageAnimationFrameConfiguration[config.FrameIndexes.Length];
+                config.Frames = new SpritesheetAnimationFrameConfiguration[config.FrameIndexes.Length];
                 for (int i = 0; i < config.FrameIndexes.Length; i++)
                 {
-                    config.Frames[i] = new ImageAnimationFrameConfiguration
+                    config.Frames[i] = new SpritesheetAnimationFrameConfiguration
                     {
-                        Image = config.Image,
-                        FrameSize = config.FrameSize,
+                        Spritesheet = config.Spritesheet,
+                        Image = config.Spritesheet?.Image ?? throw new NullReferenceException($"{nameof(config.Spritesheet)} must be set."),
                         Index = config.FrameIndexes[i]
                     };
                 }
             }
-            ResolveAnimationFrameConfigurations(config.Frames, config.Image, null, config.FrameSize);
+
+            ResolveAnimationFrameConfigurations(config.Frames, config.Spritesheet?.Image, config.Spritesheet, null);
             return Add((AnimationConfiguration)config);
         }
 
@@ -69,7 +70,7 @@ namespace ConsoleGameEngine.Animations
         /// <exception cref="ArgumentException">Occurs when required configuration data is not set.</exception>
         public Animation Add(TextureAtlasAnimationConfiguration config)
         {
-            if (config.TextureAtlas == null && config.TextureAtlasKey == null)
+            if (config.TextureAtlas == null && config.TextureAtlasKey == null && config.Frames.Length == 0)
                 throw new ArgumentNullException(nameof(config), $"Either {nameof(config.TextureAtlas)} or {nameof(config.TextureAtlasKey)} must be set.");
 
             if (config.TextureAtlas == null)
@@ -95,7 +96,7 @@ namespace ConsoleGameEngine.Animations
                 }
             }
 
-            ResolveAnimationFrameConfigurations(config.Frames, config.TextureAtlas.Image, config.TextureAtlas, null);
+            ResolveAnimationFrameConfigurations(config.Frames, config.TextureAtlas.Image, null, config.TextureAtlas);
             return Add((AnimationConfiguration)config);
         }
 
@@ -129,6 +130,23 @@ namespace ConsoleGameEngine.Animations
         /// <param name="image">The image containing the animation frames.</param>
         /// <param name="frameWidth">The width of each frame.</param>
         /// <param name="frameHeight">The height of each frame.</param>
+        /// <param name="frameIndexes">The indexes of the frames.</param>
+        /// <param name="framesPerSecond">The frame rate of the animation.</param>
+        /// <param name="repeat">The number of times to repeat the animation.  Supply -1 to repeat infinitely.</param>
+        /// <returns>The animation data.</returns>
+        public Animation Add(string key, Image image, int frameWidth, int frameHeight, int[] frameIndexes, int framesPerSecond, int repeat = 0)
+        {
+            var spritesheet = new Spritesheet(image, new FrameSize { Width = frameWidth, Height = frameHeight });
+            return Add(key, spritesheet, frameIndexes, framesPerSecond, repeat);
+        }
+
+        /// <summary>
+        /// Adds an animation with specified parameters.
+        /// </summary>
+        /// <param name="key">The unique key used to identify the animation.</param>
+        /// <param name="image">The image containing the animation frames.</param>
+        /// <param name="frameWidth">The width of each frame.</param>
+        /// <param name="frameHeight">The height of each frame.</param>
         /// <param name="frameStart">The frame index to start at.</param>
         /// <param name="frameCount">The number of frames in the animation.</param>
         /// <param name="framesPerSecond">The frame rate of the animation.</param>
@@ -136,19 +154,52 @@ namespace ConsoleGameEngine.Animations
         /// <returns>The animation data.</returns>
         public Animation Add(string key, Image image, int frameWidth, int frameHeight, int frameStart, int frameCount, int framesPerSecond, int repeat = 0)
         {
-            var config = new ImageAnimationConfiguration
+            var spritesheet = new Spritesheet(image, new FrameSize { Width = frameWidth, Height = frameHeight });
+            return Add(key, spritesheet, frameStart, frameCount, framesPerSecond, repeat);
+        }
+
+        /// <summary>
+        /// Adds an animation with specified parameters.
+        /// </summary>
+        /// <param name="key">The unique key used to identify the animation.</param>
+        /// <param name="spritesheet">The spritesheet containing the animation frames.</param>
+        /// <param name="frameIndexes">The frame index to start at.</param>
+        /// <param name="framesPerSecond">The frame rate of the animation.</param>
+        /// <param name="repeat">The number of times to repeat the animation.  Supply -1 to repeat infinitely.</param>
+        /// <returns>The animation data.</returns>
+        public Animation Add(string key, Spritesheet spritesheet, int[] frameIndexes, int framesPerSecond, int repeat = 0)
+        {
+            var config = new SpritesheetAnimationConfiguration
             {
                 Key = key,
-                Image = image,
+                Spritesheet = spritesheet,
+                FrameIndexes = frameIndexes,
                 FramesPerSecond = framesPerSecond,
-                Repeat = repeat,
+                Repeat = repeat
+            };
+            return Add(config);
+        }
+
+        /// <summary>
+        /// Adds an animation with specified parameters.
+        /// </summary>
+        /// <param name="key">The unique key used to identify the animation.</param>
+        /// <param name="spritesheet">The spritesheet containing the animation frames.</param>
+        /// <param name="frameStart">The frame index to start at.</param>
+        /// <param name="frameCount">The number of frames in the animation.</param>
+        /// <param name="framesPerSecond">The frame rate of the animation.</param>
+        /// <param name="repeat">The number of times to repeat the animation.  Supply -1 to repeat infinitely.</param>
+        /// <returns>The animation data.</returns>
+        public Animation Add(string key, Spritesheet spritesheet, int frameStart, int frameCount, int framesPerSecond, int repeat = 0)
+        {
+            var config = new SpritesheetAnimationConfiguration
+            {
+                Key = key,
+                Spritesheet = spritesheet,
                 FrameStart = frameStart,
                 FrameCount = frameCount,
-                FrameSize = new FrameSize
-                {
-                    Width = frameWidth,
-                    Height = frameHeight
-                }
+                FramesPerSecond = framesPerSecond,
+                Repeat = repeat
             };
             return Add(config);
         }
@@ -207,6 +258,22 @@ namespace ConsoleGameEngine.Animations
         /// Adds an animation with specified parameters.
         /// </summary>
         /// <param name="key">The unique key used to identify the animation.</param>
+        /// <param name="imageKey">The key of the image containing the animation frames.</param>
+        /// <param name="frameWidth">The width of each frame.</param>
+        /// <param name="frameHeight">The height of each frame.</param>
+        /// <param name="frameIndexes">The indexes of the frames.</param>
+        /// <param name="framesPerSecond">The frame rate of the animation.</param>
+        /// <param name="repeat">The number of times to repeat the animation.  Supply -1 to repeat infinitely.</param>
+        /// <returns>The animation data.</returns>
+        public Animation Add(string key, string imageKey, int frameWidth, int frameHeight, int[] frameIndexes, int framesPerSecond, int repeat = 0)
+        {
+            return Add(key, _cache.Images.Get(imageKey), frameWidth, frameHeight, frameIndexes, framesPerSecond, repeat);
+        }
+
+        /// <summary>
+        /// Adds an animation with specified parameters.
+        /// </summary>
+        /// <param name="key">The unique key used to identify the animation.</param>
         /// <param name="imageKey">The key to the image.</param>
         /// <param name="frameWidth">The width of each frame.</param>
         /// <param name="frameHeight">The height of each frame.</param>
@@ -218,6 +285,35 @@ namespace ConsoleGameEngine.Animations
         public Animation Add(string key, string imageKey, int frameWidth, int frameHeight, int frameStart, int frameCount, int framesPerSecond, int repeat = 0)
         {
             return Add(key, _cache.Images.Get(imageKey), frameWidth, frameHeight, frameStart, frameCount, framesPerSecond, repeat);
+        }
+
+        /// <summary>
+        /// Adds an animation with specified parameters.
+        /// </summary>
+        /// <param name="key">The unique key used to identify the animation.</param>
+        /// <param name="spritesheetKey">The key of the spritesheet containing the animation frames.</param>
+        /// <param name="frameIndexes">The frame index to start at.</param>
+        /// <param name="framesPerSecond">The frame rate of the animation.</param>
+        /// <param name="repeat">The number of times to repeat the animation.  Supply -1 to repeat infinitely.</param>
+        /// <returns>The animation data.</returns>
+        public Animation Add(string key, string spritesheetKey, int[] frameIndexes, int framesPerSecond, int repeat = 0)
+        {
+            return Add(key, _cache.Spritesheets.Get(spritesheetKey), frameIndexes, framesPerSecond, repeat);
+        }
+
+        /// <summary>
+        /// Adds an animation with specified parameters.
+        /// </summary>
+        /// <param name="key">The unique key used to identify the animation.</param>
+        /// <param name="spritesheetKey">The key of the spritesheet containing the animation frames.</param>
+        /// <param name="frameStart">The frame index to start at.</param>
+        /// <param name="frameCount">The number of frames in the animation.</param>
+        /// <param name="framesPerSecond">The frame rate of the animation.</param>
+        /// <param name="repeat">The number of times to repeat the animation.  Supply -1 to repeat infinitely.</param>
+        /// <returns>The animation data.</returns>
+        public Animation Add(string key, string spritesheetKey, int frameStart, int frameCount, int framesPerSecond, int repeat = 0)
+        {
+            return Add(key, _cache.Spritesheets.Get(spritesheetKey), frameStart, frameCount, framesPerSecond, repeat);
         }
 
         /// <summary>
@@ -252,44 +348,33 @@ namespace ConsoleGameEngine.Animations
         }
 
         /// <summary>
-        /// Calculates the clipping information for the specified texture atlas and frame name.
+        /// Adds an animation from an array of images.
         /// </summary>
-        /// <param name="atlas">The texture atlas.</param>
-        /// <param name="frameName">The frame name.</param>
-        /// <returns>The clipping information.</returns>
-        public ClippingInfo CalculateClipping(TextureAtlas atlas, string frameName)
+        /// <param name="key">The unique key used to identify the animation.</param>
+        /// <param name="frames">The images to use as frames.</param>
+        /// <param name="framesPerSecond">The frame rate.</param>
+        /// <param name="repeat">The number of times to repeat the animation.  Supply -1 to repeat infinitely.</param>
+        /// <returns>The animation data.</returns>
+        public Animation Add(string key, Image[] frames, int framesPerSecond, int repeat = 0)
         {
-            TextureAtlasFrame frame = atlas.Frames.First(f => f.FileName == frameName);
-            return new ClippingInfo
+            var config = new AnimationConfiguration
             {
-                X = frame.Frame.X,
-                Y = frame.Frame.Y,
-                Width = frame.Frame.W,
-                Height = frame.Frame.H
+                Key = key,
+                FramesPerSecond = framesPerSecond,
+                Repeat = repeat
             };
-        }
-
-        /// <summary>
-        /// calculates the clipping information for the specified image and frame information.
-        /// </summary>
-        /// <param name="image">The image containing the frames.</param>
-        /// <param name="frame">The frame size information.</param>
-        /// <param name="frameIndex">The index of the chosen frame.</param>
-        /// <returns>The clipping information.</returns>
-        public ClippingInfo CalculateClipping(Image image, FrameSize frame, int frameIndex)
-        {
-            int perRow = image.Width / (frame.Width + frame.MarginLeft + frame.MarginRight);
-            int row = frameIndex / perRow;
-            int col = frameIndex % perRow;
-            int x = (frame.Width + frame.MarginLeft + frame.MarginRight) * col + frame.MarginLeft;
-            int y = (frame.Height + frame.MarginTop + frame.MarginBottom) * row + frame.MarginTop;
-            return new ClippingInfo
+            config.Frames = frames.Select(f => new AnimationFrameConfiguration
             {
-                X = x,
-                Y = y,
-                Width = frame.Width,
-                Height = frame.Height
-            };
+                Image = f,
+                Clipping = new ClippingInfo
+                {
+                    X = 0,
+                    Y = 0,
+                    Width = f.Width,
+                    Height = f.Height
+                }
+            }).ToArray();
+            return Add(config);
         }
 
         /// <summary>
@@ -310,7 +395,36 @@ namespace ConsoleGameEngine.Animations
             return frameNames;
         }
 
-        private void ResolveAnimationFrameConfigurations(AnimationFrameConfiguration[] frames, Image? image, TextureAtlas? textureAtlas, FrameSize? frameConfig)
+        /// <summary>
+        /// Plays the specified animation on the target.
+        /// </summary>
+        /// <param name="key">The unique key used to identify the animation.</param>
+        /// <param name="target">The target on which the animation will be played.</param>
+        /// <param name="repeatOverride">If supplied, overrides the configured repeat.</param>
+        public void Play(string key, IAnimationTarget target, int? repeatOverride = null)
+        {
+            var animation = _animations[key];
+            
+            if (repeatOverride != null)
+                animation.Repeat = repeatOverride.Value;
+
+            target.CurrentAnimation = animation;
+        }
+
+        /// <summary>
+        /// Stops the specified animation on the specified target.
+        /// </summary>
+        /// <param name="target">The target that is currently playing the animation.</param>
+        public void Stop(IAnimationTarget target)
+        {
+            if (target.CurrentAnimation == null)
+                return;
+            Animation animation = target.CurrentAnimation.Value;
+            animation.IsStopped = true;
+            target.CurrentAnimation = animation;
+        }
+
+        private void ResolveAnimationFrameConfigurations(AnimationFrameConfiguration[] frames, Image? image, Spritesheet? spritesheet, TextureAtlas? textureAtlas)
         {
             foreach (AnimationFrameConfiguration animFrameConfig in frames)
             {
@@ -338,19 +452,25 @@ namespace ConsoleGameEngine.Animations
                         else
                             throw new ArgumentException("Cannot resolve frame texture atlas.", nameof(frames));
                     }
-                    animFrameConfig.Clipping = CalculateClipping(atlasConfig.TextureAtlas, atlasConfig.Name);
+                    animFrameConfig.Clipping = atlasConfig.TextureAtlas.CalculateClipping(atlasConfig.Name);
                 }
 
-                if (animFrameConfig is ImageAnimationFrameConfiguration imageConfig)
+                if (animFrameConfig is SpritesheetAnimationFrameConfiguration spritesheetConfig)
                 {
-                    if (imageConfig.FrameSize == null && frameConfig != null)
-                        imageConfig.FrameSize = frameConfig;
-                    else
-                        throw new ArgumentNullException(nameof(frameConfig), "frameConfig is required when animation Frame config is not set.");
-                    animFrameConfig.Clipping = CalculateClipping(animFrameConfig.Image, imageConfig.FrameSize, imageConfig.Index);
+                    if (spritesheetConfig.Spritesheet == null)
+                    {
+                        if (spritesheetConfig.SpritesheetKey != null)
+                            spritesheetConfig.Spritesheet = _cache.Spritesheets.Get(spritesheetConfig.SpritesheetKey);
+                        else if (spritesheet != null)
+                            spritesheetConfig.Spritesheet = spritesheet;
+                        else
+                            throw new ArgumentNullException(nameof(spritesheet), "If frame configuration spritesheet is null, then spritesheet must be provided at the animation level.");
+                    }
+
+                    // We have to use null coalescing here to keep the compiler happy even though we know that the spritesheet is not null.
+                    animFrameConfig.Clipping = spritesheetConfig.Spritesheet?.CalculateClipping(spritesheetConfig.Index) ?? new ClippingInfo();
                 }
             }
         }
-
     }
 }

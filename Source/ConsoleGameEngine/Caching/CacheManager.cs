@@ -12,6 +12,10 @@ namespace ConsoleGameEngine.Caching
         /// </summary>
         public Cache<Image> Images { get; } = new Cache<Image>();
         /// <summary>
+        /// The spritesheet cache.
+        /// </summary>
+        public Cache<Spritesheet> Spritesheets { get; } = new Cache<Spritesheet>();
+        /// <summary>
         /// The texture atlas cache.
         /// </summary>
         public Cache<TextureAtlas> TextureAtlases { get; } = new Cache<TextureAtlas>();

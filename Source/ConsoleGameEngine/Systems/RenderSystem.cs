@@ -103,18 +103,6 @@ namespace ConsoleGameEngine.Systems
             _previousBuffer = buffer;
         }
 
-        private static void PartialRender(Dictionary<Point, ColorChar> bufferDiff)
-        {
-            foreach(var kvp in bufferDiff)
-            {
-                Point p = kvp.Key;
-                if (p.X > Console.WindowWidth - 1 || p.Y > Console.WindowHeight - 1)
-                    continue;
-
-                RenderChar(p.X, p.Y, kvp.Value);
-            }
-        }
-
         private static void FullRender(ColorChar[,] buffer, int bufferWidth, int bufferHeight)
         {
             // Console window size changed, skip this render
@@ -143,6 +131,17 @@ namespace ConsoleGameEngine.Systems
             }
         }
 
+        private static void PartialRender(Dictionary<Point, ColorChar> bufferDiff)
+        {
+            foreach (var kvp in bufferDiff)
+            {
+                Point p = kvp.Key;
+                if (p.X > Console.WindowWidth - 1 || p.Y > Console.WindowHeight - 1)
+                    continue;
+
+                RenderChar(p.X, p.Y, kvp.Value);
+            }
+        }
 
         private static void RenderChar(int x, int y, ColorChar c)
         {
