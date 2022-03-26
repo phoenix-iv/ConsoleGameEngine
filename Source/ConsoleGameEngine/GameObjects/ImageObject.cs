@@ -1,16 +1,18 @@
-﻿using DefaultEcs;
-using System;
+﻿using ConsoleGameEngine.Components;
+using ConsoleGameEngine.Graphics;
+using DefaultEcs;
 using System.Drawing;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using ConsoleGameEngine.Components;
 
 namespace ConsoleGameEngine.GameObjects
 {
+    /// <summary>
+    /// Represents a game object that displays an image.
+    /// </summary>
     public class ImageObject : GameObject
     {
+        /// <summary>
+        /// The position of the image object.
+        /// </summary>
         public ref Position Position
         {
             get => ref Entity.Get<Position>();

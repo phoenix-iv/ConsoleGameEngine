@@ -28,7 +28,7 @@ namespace ConsoleGameEngine.ExampleGame
             _imageObject = Add.Image("test", 0, 0);
         }
 
-        public override void Update(TimeSpan delta)
+        public override void Update(GameTime time)
         {
             if (Console.KeyAvailable)
             {
@@ -47,7 +47,6 @@ namespace ConsoleGameEngine.ExampleGame
                     _imageObject.Position.X -= 1;
                 }
             }
-            base.Update(delta);
         }
     }
 }

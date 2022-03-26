@@ -1,16 +1,16 @@
 ﻿using ConsoleGameEngine.Components;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Numerics;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace ConsoleGameEngine.Cameras
 {
+    /// <summary>
+    /// Represents a camera used to transform the view.
+    /// </summary>
     public class Camera
     {
         private Position _position;
+        /// <summary>
+        /// The camera position.
+        /// </summary>
         public ref Position Position { get => ref _position; }
     }
 }

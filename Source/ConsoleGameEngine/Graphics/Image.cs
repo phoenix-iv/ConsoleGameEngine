@@ -1,16 +1,22 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace ConsoleGameEngine
+﻿namespace ConsoleGameEngine.Graphics
 {
+    /// <summary>
+    /// Represents an text-based image.
+    /// </summary>
     public class Image
     {
+        /// <summary>
+        /// The height of the image.
+        /// </summary>
         public int Height { get; private set; }
+        /// <summary>
+        /// The width of the image.
+        /// </summary>
         public int Width { get; private set; }
         private ColorChar[][] _data = Array.Empty<ColorChar[]>();
+        /// <summary>
+        /// The image data.  An array of arrays of color/character pairs representing text pixels.
+        /// </summary>
         public ColorChar[][] Data 
         {
             get => _data;
@@ -21,22 +27,38 @@ namespace ConsoleGameEngine
             }
         }
 
+        /// <summary>
+        /// Creates a new empty image.
+        /// </summary>
+        public Image()
+        {
+
+        }
+
+        /// <summary>
+        /// Creates a new image using the specified strings.
+        /// </summary>
+        /// <param name="data">The data used to translate to ColorChars.</param>
         public Image(string[] data)
         {
             SetDataFromStrings(data);
         }
 
-        public void SetDataFromStrings(string[] lines)
+        /// <summary>
+        /// Sets data from the specified array of strings.
+        /// </summary>
+        /// <param name="strings">The strings to translate to ColorChars.</param>
+        public void SetDataFromStrings(string[] strings)
         {
-            int width = lines.Max(l => l.Length / 2);
-            var data = new ColorChar[lines.Length][];
+            int width = strings.Max(l => l.Length / 2);
+            var data = new ColorChar[strings.Length][];
 
-            for (int y = 0; y < lines.Length; y++)
+            for (int y = 0; y < strings.Length; y++)
             {
                 data[y] = new ColorChar[width];
-                for(int x = 0; x < lines[y].Length; x += 2)
+                for(int x = 0; x < strings[y].Length; x += 2)
                 {
-                    var color = lines[y][x + 1] switch
+                    var color = strings[y][x + 1] switch
                     {
                         '0' => ConsoleColor.Black,
                         '1' => ConsoleColor.DarkBlue,
@@ -56,7 +78,7 @@ namespace ConsoleGameEngine
                         'f' or 'F' => ConsoleColor.White,
                         _ => ConsoleColor.Black
                     };
-                    data[y][x / 2] = new ColorChar { Char = lines[y][x], Color = color };
+                    data[y][x / 2] = new ColorChar { Char = strings[y][x], Color = color };
                 }
             }
 

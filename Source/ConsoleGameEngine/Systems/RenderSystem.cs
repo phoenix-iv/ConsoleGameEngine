@@ -1,24 +1,27 @@
 ﻿using ConsoleGameEngine.Cameras;
 using ConsoleGameEngine.Components;
+using ConsoleGameEngine.Graphics;
 using DefaultEcs;
 using DefaultEcs.System;
-using System;
-using System.Collections.Generic;
-using System.Diagnostics;
 using System.Drawing;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace ConsoleGameEngine.Systems
 {
-    public class RenderSystem : AEntitySetSystem<TimeSpan>
+    /// <summary>
+    /// Represents a system that renders to the console.
+    /// </summary>
+    public class RenderSystem : AEntitySetSystem<GameTime>
     {
         private readonly Camera _camera;
         private ColorChar[,] _previousBuffer;
         private int _previousBufferWidth;
         private int _previousBufferHeight;
 
+        /// <summary>
+        /// Creates a new instance of the <see cref="RenderSystem"/>.
+        /// </summary>
+        /// <param name="world">The ECS world the system uses.</param>
+        /// <param name="camera">The camera used to transform the view.</param>
         public RenderSystem(World world, Camera camera) : base(world.GetEntities().With<Position>().With<ClippingInfo>().With<Image>().AsSet())
         {
             _camera = camera;
@@ -27,7 +30,12 @@ namespace ConsoleGameEngine.Systems
             _previousBuffer = new ColorChar[Console.WindowWidth, Console.WindowHeight];
         }
 
-        protected override void Update(TimeSpan state, ReadOnlySpan<Entity> entities)
+        /// <summary>
+        /// Updates the render system and renders to the console.
+        /// </summary>
+        /// <param name="time">The game time.</param>
+        /// <param name="entities">The entities that contain rendering information.</param>
+        protected override void Update(GameTime time, ReadOnlySpan<Entity> entities)
         {
             Console.CursorVisible = false;
             int bufferWidth = Console.WindowWidth;
