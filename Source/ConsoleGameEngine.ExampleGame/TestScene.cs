@@ -27,7 +27,7 @@ namespace ConsoleGameEngine.ExampleGame
             ArcadePhysics.Start();
             _imageObject = Add.Image("test", 0, 0);
             _sprite = ArcadePhysics.Add.Sprite("test", 0, 0, 0, true);
-            _sprite.Body.Velocity.X = 1;
+            _sprite.Body.Velocity.X = 4;
             _sprite.Body.Velocity.Y = 2;
             Animations.Add("test", "test", 0, 4, 10, -1);
             _sprite.PlayAnimation("test");
