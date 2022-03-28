@@ -55,6 +55,9 @@ namespace ConsoleGameEngine.Systems
                 int endSourceX = clipping.X + clipping.Width;
                 for (int sourceY = clipping.Y; sourceY < endSourceY; sourceY++)
                 {
+                    if (y < 0)
+                        continue;
+
                     int x = startX;
                     for (int sourceX = clipping.X; sourceX < endSourceX; sourceX++)
                     {
