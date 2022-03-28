@@ -10,7 +10,7 @@ namespace ConsoleGameEngine.Systems
     /// <summary>
     /// Represents a system that renders to the console.
     /// </summary>
-    public class RenderSystem : AEntitySetSystem<GameTime>
+    internal class RenderSystem : AEntitySetSystem<GameTime>
     {
         private readonly Camera _camera;
         private ColorChar[,] _previousBuffer;
@@ -49,6 +49,8 @@ namespace ConsoleGameEngine.Systems
                 var image = entity.Get<Image>();
                 int startX = (int)Math.Round(position.X - _camera.Position.X);
                 int y = (int)Math.Round(position.Y - _camera.Position.Y);
+                if (y > Console.WindowHeight - 1)
+                    continue;
                 int endSourceY = clipping.Y + clipping.Height;
                 int endSourceX = clipping.X + clipping.Width;
                 for (int sourceY = clipping.Y; sourceY < endSourceY; sourceY++)
@@ -72,6 +74,8 @@ namespace ConsoleGameEngine.Systems
                         x++;
                     }
                     y++;
+                    if (y > Console.WindowHeight - 1)
+                        break;
                 }
             }
             

@@ -15,7 +15,12 @@ namespace ConsoleGameEngine.GameObjects
         /// <summary>
         /// The entity tied to this object.
         /// </summary>
-        public Entity Entity { get; }
+        internal virtual Entity Entity { get; set; }
+
+        internal GameObject()
+        {
+
+        }
 
         /// <summary>
         /// Creates a new instance of the game object.

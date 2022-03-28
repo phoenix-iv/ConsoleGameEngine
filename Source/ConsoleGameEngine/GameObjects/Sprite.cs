@@ -15,19 +15,47 @@ namespace ConsoleGameEngine.GameObjects
     /// </summary>
     public class Sprite : GameObject, IAnimationTarget
     {
+        private AnimationManager? _animationManager;
+        internal AnimationManager AnimationManager
+        {
+            get => _animationManager ?? throw new NullReferenceException();
+            set => _animationManager = value;
+        }
+        private AnimationTargetEntityHandler? _animationHandler;
+        private AnimationTargetEntityHandler AnimationHandler
+        {
+            get => _animationHandler ?? throw new NullReferenceException();
+            set => _animationHandler = value;
+        }
+
         /// <summary>
         /// The current animation being played.
         /// </summary>
         public Animation? CurrentAnimation 
         {
-            get => _animationHandler.GetCurrentAnimation();
-            set => _animationHandler.SetCurrentAnimation(value);
+            get => AnimationHandler.GetCurrentAnimation();
+            set => AnimationHandler.SetCurrentAnimation(value);
+        }
+
+        private Entity _entity;
+        /// <summary>
+        /// The ECS entity associated with this sprite.
+        /// </summary>
+        internal override Entity Entity 
+        { 
+            get => _entity; 
+            set
+            {
+                _entity = value;
+                _animationHandler = new AnimationTargetEntityHandler(_entity);
+            }
+                
         }
 
         /// <summary>
         /// The image associated with this sprite.
         /// </summary>
-        public Image? Image { get; set; }
+        public Image? Image { get; private set; }
         /// <summary>
         /// The position of the sprite. 
         /// </summary>
@@ -35,43 +63,70 @@ namespace ConsoleGameEngine.GameObjects
         /// <summary>
         /// The spritesheet associated with this sprite.
         /// </summary>
-        public Spritesheet? Spritesheet { get; set; }
+        public Spritesheet? Spritesheet { get; private set; }
         /// <summary>
         /// The texture atlas associated with this sprite.
         /// </summary>
-        public TextureAtlas? TextureAtlas { get; set; }
+        public TextureAtlas? TextureAtlas { get; private set; }
 
-        private AnimationManager _animationManager;
-        private AnimationTargetEntityHandler _animationHandler;
-
-        internal Sprite(Entity entity, AnimationManager animationManager, Image image) : base(entity)
+        /// <summary>
+        /// Creates a new instance of <see cref="Sprite"/>.
+        /// WARNING: If called directly, the <see cref="Initialize(Entity, AnimationManager)"/> method and one of 
+        /// <see cref="InitializeImage(Image)"/>, <see cref="InitializeSpritesheet(Spritesheet)"/> or <see cref="InitializeTextureAtlas(TextureAtlas)"/>
+        /// must be called in order for this sprite to function correctly.  Ideally, you should not call this constructor but use one of methods in 
+        /// <see cref="GameObjectFactory"/>.
+        /// </summary>
+        public Sprite()
         {
+            
+        }
+
+        /// <summary>
+        /// Initializes this sprite with the specified parameters.
+        /// </summary>
+        /// <param name="entity">The ECS entity associated with this sprite.</param>
+        /// <param name="animationManager">The animation manager used to play animations on this sprite.</param>
+        public virtual void Initialize(Entity entity, AnimationManager animationManager)
+        {
+            Entity = entity;
+            Entity.Set(new Position());
+            Entity.Set(new ClippingInfo());
             _animationManager = animationManager;
             _animationHandler = new AnimationTargetEntityHandler(entity);
+        }
+
+        /// <summary>
+        /// Initializes this sprite with an image.
+        /// </summary>
+        /// <param name="image">The image to use.</param>
+        public void InitializeImage(Image image)
+        {
             Image = image;
             Initialize(image);
         }
 
-        internal Sprite(Entity entity, AnimationManager animationManager, Spritesheet spritesheet) : base(entity)
+        /// <summary>
+        /// Initializes this sprite with a spritesheet.
+        /// </summary>
+        /// <param name="spritesheet">The spritesheet to use.</param>
+        public void InitializeSpritesheet(Spritesheet spritesheet)
         {
-            _animationManager = animationManager;
-            _animationHandler = new AnimationTargetEntityHandler(entity);
             Spritesheet = spritesheet;
             Initialize(spritesheet.Image);
         }
 
-        internal Sprite(Entity entity, AnimationManager animationManager, TextureAtlas atlas) : base(entity)
+        /// <summary>
+        /// Initializes this sprite with a texture atlas.
+        /// </summary>
+        /// <param name="atlas">The texture atlas to use.</param>
+        public void InitializeTextureAtlas(TextureAtlas atlas)
         {
-            _animationManager = animationManager;
-            _animationHandler = new AnimationTargetEntityHandler(entity);
             TextureAtlas = atlas;
-            Initialize(atlas.Image);
+            Initialize(TextureAtlas.Image);
         }
 
         private void Initialize(Image image)
         {
-            Entity.Set(new Position());
-            Entity.Set(new ClippingInfo());
             Entity.Set(image);
         }
 
@@ -82,7 +137,7 @@ namespace ConsoleGameEngine.GameObjects
         /// <param name="repeatOverride">If supplied, overrides the configured repeat on the animation.</param>
         public void PlayAnimation(string key, int? repeatOverride = null)
         {
-            _animationManager.Play(key, this, repeatOverride);
+            AnimationManager.Play(key, this, repeatOverride);
         }
 
         /// <summary>
@@ -124,7 +179,7 @@ namespace ConsoleGameEngine.GameObjects
         /// </summary>
         public void StopAnimation()
         {
-            _animationManager.Stop(this);
+            AnimationManager.Stop(this);
         }
 
     }

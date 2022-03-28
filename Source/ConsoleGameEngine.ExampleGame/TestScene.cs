@@ -1,5 +1,6 @@
 ﻿using ConsoleGameEngine.GameObjects;
 using ConsoleGameEngine.Graphics;
+using ConsoleGameEngine.Physics.Arcade.GameObjects;
 
 namespace ConsoleGameEngine.ExampleGame
 {
@@ -7,7 +8,7 @@ namespace ConsoleGameEngine.ExampleGame
     {
 #nullable disable
         private ImageObject _imageObject;
-        private Sprite _sprite;
+        private SpriteWithDynamicBody _sprite;
 #nullable enable
 
         public TestScene(Game game) : base(game)
@@ -23,8 +24,11 @@ namespace ConsoleGameEngine.ExampleGame
 
         public override void Create()
         {
+            ArcadePhysics.Start();
             _imageObject = Add.Image("test", 0, 0);
-            _sprite = Add.Sprite("test", 0, 0, 0, true);
+            _sprite = ArcadePhysics.Add.Sprite("test", 0, 0, 0, true);
+            _sprite.Body.Velocity.X = 1;
+            _sprite.Body.Velocity.Y = 2;
             Animations.Add("test", "test", 0, 4, 10, -1);
             _sprite.PlayAnimation("test");
         }
@@ -40,12 +44,12 @@ namespace ConsoleGameEngine.ExampleGame
 
                 if (keyInfo.Key == ConsoleKey.RightArrow)
                 {
-                    _imageObject.Position.X += 1;
+                    _sprite.Position.X += 1;
                 }
 
                 if (keyInfo.Key == ConsoleKey.LeftArrow)
                 {
-                    _imageObject.Position.X -= 1;
+                    _sprite.Position.X -= 1;
                 }
             }
         }

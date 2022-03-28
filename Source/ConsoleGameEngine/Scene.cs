@@ -22,6 +22,10 @@ namespace ConsoleGameEngine
         /// </summary>
         public AnimationManager Animations { get; }
         /// <summary>
+        /// Access to the Arcade Physics system.
+        /// </summary>
+        public Physics.Arcade.ArcadePhysics ArcadePhysics { get; }
+        /// <summary>
         /// The scene's camera.
         /// </summary>
         public Camera Camera { get; }
@@ -43,7 +47,7 @@ namespace ConsoleGameEngine
         /// </summary>
         public World World { get; }
 
-        private readonly SequentialSystem<GameTime> _system;
+        private SequentialSystem<GameTime> _system;
 
         /// <summary>
         /// Creates a new instance of <see cref="Scene"/>.
@@ -55,9 +59,10 @@ namespace ConsoleGameEngine
             Game = game;
             Add = new GameObjectFactory(this, game.Animations, game.Cache);
             Animations = game.Animations;
+            ArcadePhysics = new Physics.Arcade.ArcadePhysics(this, game.Animations, game.Cache);
             Camera = new Camera();
             Load = new Loader(Game.Cache);
-            _system = new SequentialSystem<GameTime>(new AnimationSystem(World), new RenderSystem(World, Camera));
+            _system = BuildSystem();
         }
 
         /// <summary>
@@ -75,6 +80,16 @@ namespace ConsoleGameEngine
         {
 
         }
+        
+        /// <summary>
+        /// Rebuilds the main system including the specified physics systems.
+        /// </summary>
+        /// <param name="physicsSystems">The physics systems to include in the main system.</param>
+        public void RebuildSystem(IEnumerable<ISystem<GameTime>>? physicsSystems)
+        {
+            _system.Dispose();
+            _system = BuildSystem(physicsSystems);
+        }
 
         /// <summary>
         /// When overridden performs any updates to the scene.
@@ -82,6 +97,7 @@ namespace ConsoleGameEngine
         /// <param name="time">The game time.</param>
         public virtual void Update(GameTime time)
         {
+
         }
 
         internal void UpdateInternal(GameTime time)
@@ -116,6 +132,18 @@ namespace ConsoleGameEngine
         {
             _children.Remove(gameObject);
             gameObject.Entity.Disable();
+        }
+
+        private SequentialSystem<GameTime> BuildSystem(IEnumerable<ISystem<GameTime>>? physicsSystems = null)
+        {
+            var systems = new List<ISystem<GameTime>>();
+            if (physicsSystems != null)
+            {
+                systems.AddRange(physicsSystems);
+            }
+            systems.Add(new AnimationSystem(World));
+            systems.Add(new RenderSystem(World, Camera));
+            return new SequentialSystem<GameTime>(systems);
         }
     }
 }
