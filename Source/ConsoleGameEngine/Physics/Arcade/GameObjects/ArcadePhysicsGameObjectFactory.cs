@@ -9,15 +9,18 @@ namespace ConsoleGameEngine.Physics.Arcade.GameObjects
     /// </summary>
     public class ArcadePhysicsGameObjectFactory : GameObjectFactoryBase
     {
+        private readonly ArcadePhysics _physics;
+
         /// <summary>
         /// Creates a new instance of <see cref="ArcadePhysicsGameObjectFactory"/>
         /// </summary>
+        /// <param name="physics">The physics system to add bodies to.</param>
         /// <param name="scene">The scene to add objects to.</param>
         /// <param name="animationManager">The game level animation manager used for objects that need it.</param>
         /// <param name="cache">The game level cache manager.</param>
-        public ArcadePhysicsGameObjectFactory(Scene scene, AnimationManager animationManager, CacheManager cache) : base(scene, animationManager, cache)
+        public ArcadePhysicsGameObjectFactory(ArcadePhysics physics, Scene scene, AnimationManager animationManager, CacheManager cache) : base(scene, animationManager, cache)
         {
-
+            _physics = physics;
         }
 
         /// <summary>
@@ -31,8 +34,7 @@ namespace ConsoleGameEngine.Physics.Arcade.GameObjects
         public SpriteWithDynamicBody Sprite(string imageKey, float x, float y, bool addToScene = true)
         {
             var sprite = AddSprite<SpriteWithDynamicBody>(imageKey, x, y, addToScene);
-            sprite.ResetBody();
-            return sprite;
+            return AddSpriteToPhysicsWorld<SpriteWithDynamicBody, DynamicBody>(sprite);
         }
 
         /// <summary>
@@ -47,8 +49,7 @@ namespace ConsoleGameEngine.Physics.Arcade.GameObjects
         public SpriteWithDynamicBody Sprite(string spritesheetKey, float x, float y, int initialFrame, bool addToScene = true)
         {
             var sprite = AddSprite<SpriteWithDynamicBody>(spritesheetKey, x, y, initialFrame, addToScene);
-            sprite.ResetBody();
-            return sprite;
+            return AddSpriteToPhysicsWorld<SpriteWithDynamicBody, DynamicBody>(sprite);
         }
 
         /// <summary>
@@ -63,8 +64,7 @@ namespace ConsoleGameEngine.Physics.Arcade.GameObjects
         public Sprite Sprite(string textureAtlasKey, float x, float y, string? initialFrame, bool addToScene = true)
         {
             var sprite = AddSprite<SpriteWithDynamicBody>(textureAtlasKey, x, y, initialFrame, addToScene);
-            sprite.ResetBody();
-            return sprite;
+            return AddSpriteToPhysicsWorld<SpriteWithDynamicBody, DynamicBody>(sprite);
         }
 
 
@@ -79,8 +79,7 @@ namespace ConsoleGameEngine.Physics.Arcade.GameObjects
         public SpriteWithStaticBody StaticSprite(string imageKey, float x, float y, bool addToScene = true)
         {
             var sprite = AddSprite<SpriteWithStaticBody>(imageKey, x, y, addToScene);
-            sprite.ResetBody();
-            return sprite;
+            return AddSpriteToPhysicsWorld<SpriteWithStaticBody, StaticBody>(sprite);
         }
 
         /// <summary>
@@ -95,8 +94,7 @@ namespace ConsoleGameEngine.Physics.Arcade.GameObjects
         public SpriteWithStaticBody StaticSprite(string spritesheetKey, float x, float y, int initialFrame, bool addToScene = true)
         {
             var sprite = AddSprite<SpriteWithStaticBody>(spritesheetKey, x, y, initialFrame, addToScene);
-            sprite.ResetBody();
-            return sprite;
+            return AddSpriteToPhysicsWorld<SpriteWithStaticBody, StaticBody>(sprite);
         }
 
         /// <summary>
@@ -111,8 +109,14 @@ namespace ConsoleGameEngine.Physics.Arcade.GameObjects
         public SpriteWithStaticBody StaticSprite(string textureAtlasKey, float x, float y, string? initialFrame, bool addToScene = true)
         {
             var sprite = AddSprite<SpriteWithStaticBody>(textureAtlasKey, x, y, initialFrame, addToScene);
+            return AddSpriteToPhysicsWorld<SpriteWithStaticBody, StaticBody>(sprite);
+        }
+
+        private T AddSpriteToPhysicsWorld<T, TBody>(T sprite) where T : SpriteWithBody<TBody> where TBody : Body
+        {
             sprite.ResetBody();
+            _physics.World.AddBody(sprite.Body);
             return sprite;
         }
-    }
+    }  
 }

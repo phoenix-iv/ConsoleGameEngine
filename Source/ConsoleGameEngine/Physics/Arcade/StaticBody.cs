@@ -1,4 +1,4 @@
-﻿using ConsoleGameEngine.Components.Physics.Arcade;
+﻿using ConsoleGameEngine.Physics.Arcade.Components;
 using DefaultEcs;
 
 namespace ConsoleGameEngine.Physics.Arcade
@@ -14,7 +14,7 @@ namespace ConsoleGameEngine.Physics.Arcade
         /// <param name="entity">The entity associated with the body owner.</param>
         public StaticBody(Entity entity) : base(entity)
         {
-            entity.Set(new StaticBodyInfo());
+            entity.Set(new BodyType { Type = BodyTypeCode.Static });
         }
     }
 }

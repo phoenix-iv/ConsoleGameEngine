@@ -115,7 +115,7 @@ namespace ConsoleGameEngine.GameObjects
         protected void AddToScene(GameObject o, bool addToScene)
         {
             if (addToScene)
-                _scene.AddChild(o);
+                _scene.AddGameObject(o);
             else
                 o.Entity.Disable();
         }

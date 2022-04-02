@@ -1,21 +1,19 @@
 ﻿using ConsoleGameEngine.Components;
-using System.Drawing;
 
 namespace ConsoleGameEngine.Physics.Arcade.Components
 {
     /// <summary>
-    /// Contains data for a physics body.
+    /// Contains data about a body's position. 
     /// </summary>
-    public struct BodyInfo
+    public struct BodyPosition
     {
         /// <summary>
-        /// The body postition relative to its owner.
+        /// The body offset relative to its owner.
         /// </summary>
         public Position Offset;
         /// <summary>
-        /// The size of the body.
+        /// The calculated projected position of the body.
         /// </summary>
-        public Size Size;
+        public Position ProjectedPosition;
     }
-
 }

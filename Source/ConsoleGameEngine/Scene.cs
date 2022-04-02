@@ -118,17 +118,23 @@ namespace ConsoleGameEngine
         /// Adds a child game object to this scene.
         /// </summary>
         /// <param name="gameObject">The object to add.</param>
-        public void AddChild(GameObject gameObject)
+        public void AddGameObject(GameObject gameObject)
         {
             gameObject.Entity.Enable();
             _children.Add(gameObject);
         }
 
         /// <summary>
+        /// Gets the child game objects of this scene.
+        /// </summary>
+        /// <returns>The child game objects of this scene.</returns>
+        public IEnumerable<GameObject> GetGameObjects() => Children;
+
+        /// <summary>
         /// Removes a child game object from this scene.
         /// </summary>
         /// <param name="gameObject">The object to remove.</param>
-        public void RemoveChild(GameObject gameObject)
+        public void RemoveGameObject(GameObject gameObject)
         {
             _children.Remove(gameObject);
             gameObject.Entity.Disable();

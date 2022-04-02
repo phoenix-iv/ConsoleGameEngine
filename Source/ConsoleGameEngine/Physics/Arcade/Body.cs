@@ -17,12 +17,12 @@ namespace ConsoleGameEngine.Physics.Arcade
         /// <summary>
         /// The body postition relative to its owner.
         /// </summary>
-        public ref Position Offset => ref Entity.Get<BodyInfo>().Offset;
+        public ref Position Offset => ref Entity.Get<BodyPosition>().Offset;
 
         /// <summary>
         /// The size of the body.
         /// </summary>
-        public ref Size Size => ref Entity.Get<BodyInfo>().Size;
+        public ref SizeF Size => ref Entity.Get<BodySize>().Size;
 
         /// <summary>
         /// Creates a new instance of <see cref="Body"/>.
@@ -31,7 +31,8 @@ namespace ConsoleGameEngine.Physics.Arcade
         public Body(Entity entity)
         {
             Entity = entity;
-            entity.Set(new BodyInfo());
+            entity.Set(new BodyPosition());
+            entity.Set(new BodySize());
         }
     }
 }

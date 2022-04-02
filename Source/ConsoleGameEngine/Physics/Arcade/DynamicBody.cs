@@ -1,4 +1,4 @@
-﻿using ConsoleGameEngine.Components.Physics.Arcade;
+﻿using ConsoleGameEngine.Physics.Arcade.Components;
 using DefaultEcs;
 using System.Numerics;
 
@@ -12,7 +12,7 @@ namespace ConsoleGameEngine.Physics.Arcade
         /// <summary>
         /// The body's current velocity.
         /// </summary>
-        public ref Vector2 Velocity => ref Entity.Get<DynamicBodyInfo>().Velocity;
+        public ref Vector2 Velocity => ref Entity.Get<Velocity>().Value;
 
         /// <summary>
         /// Creates a new instance of <see cref="DynamicBody"/>.
@@ -20,7 +20,8 @@ namespace ConsoleGameEngine.Physics.Arcade
         /// <param name="entity">The entity associated with the body's owner.</param>
         public DynamicBody(Entity entity) : base(entity)
         {
-            entity.Set(new DynamicBodyInfo());
+            entity.Set(new Velocity());
+            entity.Set(new BodyType { Type = BodyTypeCode.Dynamic });
         }
     }
 }

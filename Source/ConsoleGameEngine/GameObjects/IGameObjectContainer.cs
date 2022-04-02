@@ -9,11 +9,16 @@
         /// Adds a child game object to the container.
         /// </summary>
         /// <param name="gameObject">The object to add.</param>
-        void AddChild(GameObject gameObject);
+        void AddGameObject(GameObject gameObject);
         /// <summary>
         /// Removes a child game object from the container.
         /// </summary>
         /// <param name="gameObject">The object to remove.</param>
-        void RemoveChild(GameObject gameObject);
+        void RemoveGameObject(GameObject gameObject);
+        /// <summary>
+        /// Gets the child objects of this container.
+        /// </summary>
+        /// <returns>The child objects of this container</returns>
+        IEnumerable<GameObject> GetGameObjects();
     }
 }
