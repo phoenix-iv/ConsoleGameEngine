@@ -16,6 +16,14 @@ namespace ConsoleGameEngine.Physics.Box2D.GameObjects
     /// </summary>
     public class Box2dGameObjectFactory : GameObjectFactoryBase
     {
+        /// <summary>
+        /// Defines a method that sets up a physics body.
+        /// </summary>
+        /// <param name="bodyDef">The body definition.</param>
+        /// <param name="polygonDef">The polygon fixture definition.  Will be set as a box.</param>
+        /// <returns>Either the supplied polygonDef or a new fixture definition which will replace the polygonDef.</returns>
+        public delegate FixtureDef SetupBodyDelegate(ref BodyDef bodyDef, PolygonDef polygonDef);
+
         private readonly Box2dPhysics _physics;
 
         /// <summary>
@@ -36,12 +44,12 @@ namespace ConsoleGameEngine.Physics.Box2D.GameObjects
         /// <param name="imageKey">The key to the image.</param>
         /// <param name="x">The initial x coordinate of the sprite.</param>
         /// <param name="y">The initial y coordinate of the sprite.</param>
-        /// <param name="collisionFilter">The collision filter data.</param>
+        /// <param name="setupBody">A callback used to do any custom setup of the physics body.</param>
         /// <returns>The newly created sprite.</returns>
-        public SpriteWithBody Sprite(string imageKey, float x, float y, FilterData? collisionFilter = null)
+        public SpriteWithBody Sprite(string imageKey, float x, float y, SetupBodyDelegate? setupBody = null)
         {
             var sprite = AddSprite<SpriteWithBody>(imageKey, x, y, true);
-            return AddBodyAndToPhysicsWorld(sprite, false, collisionFilter);
+            return AddBodyAndToPhysicsWorld(sprite, false, setupBody);
         }
 
         /// <summary>
@@ -51,12 +59,12 @@ namespace ConsoleGameEngine.Physics.Box2D.GameObjects
         /// <param name="x">The initial x coordinate of the sprite.</param>
         /// <param name="y">The initial y coordinate of the sprite.</param>
         /// <param name="initialFrame">The initial frame index.</param>
-        /// <param name="collisionFilter">The collision filter data.</param>
+        /// <param name="setupBody">A callback used to do any custom setup of the physics body.</param>
         /// <returns>The newly created sprite.</returns>
-        public SpriteWithBody Sprite(string spritesheetKey, float x, float y, int initialFrame, FilterData? collisionFilter = null)
+        public SpriteWithBody Sprite(string spritesheetKey, float x, float y, int initialFrame, SetupBodyDelegate? setupBody = null)
         {
             var sprite = AddSprite<SpriteWithBody>(spritesheetKey, x, y, initialFrame, true);
-            return AddBodyAndToPhysicsWorld(sprite, false, collisionFilter);
+            return AddBodyAndToPhysicsWorld(sprite, false, setupBody);
         }
 
         /// <summary>
@@ -66,12 +74,12 @@ namespace ConsoleGameEngine.Physics.Box2D.GameObjects
         /// <param name="x">The initial x coordinate of the sprite.</param>
         /// <param name="y">The initial y coordinate of the sprite.</param>
         /// <param name="initialFrame">The initial frame.  If null, the first frame in the atlas will be used.</param>
-        /// <param name="collisionFilter">The collision filter data.</param>
+        /// <param name="setupBody">A callback used to do any custom setup of the physics body.</param>
         /// <returns>The newly created sprite.</returns>
-        public SpriteWithBody Sprite(string textureAtlasKey, float x, float y, string? initialFrame, FilterData? collisionFilter = null)
+        public SpriteWithBody Sprite(string textureAtlasKey, float x, float y, string? initialFrame, SetupBodyDelegate? setupBody = null)
         {
             var sprite = AddSprite<SpriteWithBody>(textureAtlasKey, x, y, initialFrame, true);
-            return AddBodyAndToPhysicsWorld(sprite, false, collisionFilter);
+            return AddBodyAndToPhysicsWorld(sprite, false, setupBody);
         }
 
 
@@ -81,12 +89,12 @@ namespace ConsoleGameEngine.Physics.Box2D.GameObjects
         /// <param name="imageKey">The key to the image.</param>
         /// <param name="x">The initial x coordinate of the sprite.</param>
         /// <param name="y">The initial y coordinate of the sprite.</param>
-        /// <param name="collisionFilter">The collision filter data.</param>
+        /// <param name="setupBody">A callback used to do any custom setup of the physics body.</param>
         /// <returns>The newly created sprite.</returns>
-        public SpriteWithBody StaticSprite(string imageKey, float x, float y, FilterData? collisionFilter = null)
+        public SpriteWithBody StaticSprite(string imageKey, float x, float y, SetupBodyDelegate? setupBody = null)
         {
             var sprite = AddSprite<SpriteWithBody>(imageKey, x, y, true);
-            return AddBodyAndToPhysicsWorld(sprite, true, collisionFilter);
+            return AddBodyAndToPhysicsWorld(sprite, true, setupBody);
         }
 
         /// <summary>
@@ -96,12 +104,12 @@ namespace ConsoleGameEngine.Physics.Box2D.GameObjects
         /// <param name="x">The initial x coordinate of the sprite.</param>
         /// <param name="y">The initial y coordinate of the sprite.</param>
         /// <param name="initialFrame">The initial frame index.</param>
-        /// <param name="collisionFilter">The collision filter data.</param>
+        /// <param name="setupBody">A callback used to do any custom setup of the physics body.</param>
         /// <returns>The newly created sprite.</returns>
-        public SpriteWithBody StaticSprite(string spritesheetKey, float x, float y, int initialFrame, FilterData? collisionFilter = null)
+        public SpriteWithBody StaticSprite(string spritesheetKey, float x, float y, int initialFrame, SetupBodyDelegate? setupBody = null)
         {
             var sprite = AddSprite<SpriteWithBody>(spritesheetKey, x, y, initialFrame, true);
-            return AddBodyAndToPhysicsWorld(sprite, true, collisionFilter);
+            return AddBodyAndToPhysicsWorld(sprite, true, setupBody);
         }
 
         /// <summary>
@@ -111,15 +119,15 @@ namespace ConsoleGameEngine.Physics.Box2D.GameObjects
         /// <param name="x">The initial x coordinate of the sprite.</param>
         /// <param name="y">The initial y coordinate of the sprite.</param>
         /// <param name="initialFrame">The initial frame.  If null, the first frame in the atlas will be used.</param>
-        /// <param name="collisionFilter">The collision filter data.</param>
+        /// <param name="setupBody">A callback used to do any custom setup of the physics body.</param>
         /// <returns>The newly created sprite.</returns>
-        public SpriteWithBody StaticSprite(string textureAtlasKey, float x, float y, string? initialFrame, FilterData? collisionFilter = null)
+        public SpriteWithBody StaticSprite(string textureAtlasKey, float x, float y, string? initialFrame, SetupBodyDelegate? setupBody = null)
         {
             var sprite = AddSprite<SpriteWithBody>(textureAtlasKey, x, y, initialFrame, true);
-            return AddBodyAndToPhysicsWorld(sprite, true, collisionFilter);
+            return AddBodyAndToPhysicsWorld(sprite, true, setupBody);
         }
 
-        private T AddBodyAndToPhysicsWorld<T>(T o, bool isStatic, FilterData? collisionFilter) where T : GameObject, IBox2dWithBody
+        private T AddBodyAndToPhysicsWorld<T>(T o, bool isStatic, SetupBodyDelegate? setupBody = null) where T : GameObject, IBox2dWithBody
         {
             var bodyDef = new BodyDef
             {
@@ -132,21 +140,23 @@ namespace ConsoleGameEngine.Physics.Box2D.GameObjects
             bodyPosition.X += size.HalfWidth * _physics.MetersPerChar;
             bodyPosition.Y -= size.HalfHeight * _physics.MetersPerChar;
             bodyDef.Position = bodyPosition;
-            Body body = _physics.World.CreateBody(bodyDef);
-            var shapeDef = new PolygonDef();
-            shapeDef.SetAsBox(size.Width * _physics.MetersPerChar, size.Height * _physics.MetersPerChar);
+            var polygonDef = new PolygonDef();
+            polygonDef.SetAsBox(size.HalfWidth * _physics.MetersPerChar, size.HalfHeight * _physics.MetersPerChar);
 
-            if (collisionFilter != null)
-                shapeDef.Filter = collisionFilter.Value;  
+            if (!isStatic)
+                polygonDef.Density = 1;
+
+            FixtureDef fixtureDef = polygonDef;
+
+            if (setupBody != null)
+                fixtureDef = setupBody(ref bodyDef, polygonDef);
+
+            Body body = _physics.World.CreateBody(bodyDef);
+            body.CreateFixture(fixtureDef);
 
             if (isStatic)
                 body.SetStatic();
             else
-                shapeDef.Density = 1;
-
-            body.CreateFixture(shapeDef);
-
-            if (!isStatic)
                 body.SetMassFromShapes();
 
             o.Body = body;
