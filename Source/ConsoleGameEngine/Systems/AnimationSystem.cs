@@ -17,7 +17,7 @@ namespace ConsoleGameEngine.Systems
         /// Creates a new instance of the <see cref="AnimationSystem"/> class.
         /// </summary>
         /// <param name="world">The ECS world that this system uses.</param>
-        public AnimationSystem(World world) : base(world.GetEntities().With<EntityIdentifier>().With<Animation>().With<ClippingInfo>().With<Image>().AsSet(), true)
+        public AnimationSystem(World world) : base(world.GetEntities().With<EntityIdentifier>().With<Animation>().With<ClippingInfo>().With<Image>().With<EntitySize>().AsSet(), true)
         {
             _world = world;
         }
@@ -59,6 +59,7 @@ namespace ConsoleGameEngine.Systems
             AnimationFrame frame = animation.Frames[animation.FrameIndex];
             entity.Set(frame.Image);
             entity.Set(frame.ClippingInfo);
+            entity.Set(new EntitySize { Width = frame.ClippingInfo.Width, Height = frame.ClippingInfo.Height });
         }
     }
 }

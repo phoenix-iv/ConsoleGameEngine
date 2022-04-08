@@ -22,9 +22,9 @@ namespace ConsoleGameEngine
         /// </summary>
         public AnimationManager Animations { get; }
         /// <summary>
-        /// Access to the Arcade Physics system.
+        /// Access to the Box2D Physics system.
         /// </summary>
-        public Physics.Arcade.ArcadePhysics ArcadePhysics { get; }
+        public Physics.Box2D.Box2dPhysics Box2dPhysics { get; }
         /// <summary>
         /// The scene's camera.
         /// </summary>
@@ -47,7 +47,8 @@ namespace ConsoleGameEngine
         /// </summary>
         public World World { get; }
 
-        private SequentialSystem<GameTime> _system;
+        private SequentialSystem<GameTime> _updatePipeline;
+        private SequentialSystem<object?> _renderPipeline;
 
         /// <summary>
         /// Creates a new instance of <see cref="Scene"/>.
@@ -59,10 +60,11 @@ namespace ConsoleGameEngine
             Game = game;
             Add = new GameObjectFactory(this, game.Animations, game.Cache);
             Animations = game.Animations;
-            ArcadePhysics = new Physics.Arcade.ArcadePhysics(this, game.Animations, game.Cache);
+            Box2dPhysics = new Physics.Box2D.Box2dPhysics(this, game.Animations, game.Cache);
             Camera = new Camera();
             Load = new Loader(Game.Cache);
-            _system = BuildSystem();
+            _updatePipeline = BuildUpdatePipeline();
+            _renderPipeline = BuildRenderPipeline();
         }
 
         /// <summary>
@@ -82,13 +84,21 @@ namespace ConsoleGameEngine
         }
         
         /// <summary>
-        /// Rebuilds the main system including the specified physics systems.
+        /// Injects the specified physics systems into the update system pipeline.
         /// </summary>
-        /// <param name="physicsSystems">The physics systems to include in the main system.</param>
-        public void RebuildSystem(IEnumerable<ISystem<GameTime>>? physicsSystems)
+        /// <param name="physicsSystems">The physics systems to include in the update pipeline.</param>
+        public void InjectPhysicsSystems(IEnumerable<ISystem<GameTime>>? physicsSystems)
         {
-            _system.Dispose();
-            _system = BuildSystem(physicsSystems);
+            _updatePipeline.Dispose();
+            _updatePipeline = BuildUpdatePipeline(physicsSystems);
+        }
+
+        /// <summary>
+        /// Renders the scene to the screen.
+        /// </summary>
+        public void Render()
+        {
+            _renderPipeline.Update(null);
         }
 
         /// <summary>
@@ -103,7 +113,7 @@ namespace ConsoleGameEngine
         internal void UpdateInternal(GameTime time)
         {
             Update(time);
-            _system.Update(time);
+            _updatePipeline.Update(time);
         }
 
         /// <summary>
@@ -140,7 +150,12 @@ namespace ConsoleGameEngine
             gameObject.Entity.Disable();
         }
 
-        private SequentialSystem<GameTime> BuildSystem(IEnumerable<ISystem<GameTime>>? physicsSystems = null)
+        private SequentialSystem<object?> BuildRenderPipeline()
+        {
+            return new SequentialSystem<object?>(new RenderSystem(World, Camera));
+        }
+
+        private SequentialSystem<GameTime> BuildUpdatePipeline(IEnumerable<ISystem<GameTime>>? physicsSystems = null)
         {
             var systems = new List<ISystem<GameTime>>();
             if (physicsSystems != null)
@@ -148,7 +163,6 @@ namespace ConsoleGameEngine
                 systems.AddRange(physicsSystems);
             }
             systems.Add(new AnimationSystem(World));
-            systems.Add(new RenderSystem(World, Camera));
             return new SequentialSystem<GameTime>(systems);
         }
     }
