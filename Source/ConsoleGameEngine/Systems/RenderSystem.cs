@@ -10,7 +10,7 @@ namespace ConsoleGameEngine.Systems
     /// <summary>
     /// Represents a system that renders to the console.
     /// </summary>
-    internal class RenderSystem : AEntitySetSystem<GameTime>
+    internal class RenderSystem : AEntitySetSystem<object?>
     {
         private readonly Camera _camera;
         private ColorChar[,] _previousBuffer;
@@ -33,9 +33,9 @@ namespace ConsoleGameEngine.Systems
         /// <summary>
         /// Updates the render system and renders to the console.
         /// </summary>
-        /// <param name="time">The game time.</param>
+        /// <param name="state">The render state.  Currently will always be null.</param>
         /// <param name="entities">The entities that contain rendering information.</param>
-        protected override void Update(GameTime time, ReadOnlySpan<Entity> entities)
+        protected override void Update(object? state, ReadOnlySpan<Entity> entities)
         {
             Console.CursorVisible = false;
             int bufferWidth = Console.WindowWidth;
@@ -67,7 +67,7 @@ namespace ConsoleGameEngine.Systems
                             continue;
                         }
 
-                        if (x > Console.WindowWidth - 1)
+                        if (x > bufferWidth - 1)
                         {
                             break;
                         }
@@ -77,7 +77,7 @@ namespace ConsoleGameEngine.Systems
                         x++;
                     }
                     y++;
-                    if (y > Console.WindowHeight - 1)
+                    if (y > bufferHeight - 1)
                         break;
                 }
             }

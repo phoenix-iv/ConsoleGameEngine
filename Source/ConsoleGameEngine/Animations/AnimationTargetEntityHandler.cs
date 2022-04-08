@@ -13,7 +13,7 @@ namespace ConsoleGameEngine.Animations
     /// </summary>
     public class AnimationTargetEntityHandler
     {
-        private Entity _entity;
+        private readonly Entity _entity;
 
         /// <summary>
         /// Creates a new instance of <see cref="AnimationTargetEntityHandler"/>

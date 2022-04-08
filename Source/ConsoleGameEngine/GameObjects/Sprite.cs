@@ -151,14 +151,12 @@ namespace ConsoleGameEngine.GameObjects
 
             if (Spritesheet != null)
             {
-                Entity.Set(Spritesheet.Image);
-                Entity.Set(Spritesheet.CalculateClipping(index));
+                SetImageAndClipping(Spritesheet.Image, Spritesheet.CalculateClipping(index));
             }
 
             if (Image != null)
             {
-                Entity.Set(Image);
-                Entity.Set(new ClippingInfo { X = 0, Y = 0, Width = Image.Width, Height = Image.Height });
+                SetImageAndClipping(Image, new ClippingInfo { X = 0, Y = 0, Width = Image.Width, Height = Image.Height });
             }
         }
 
@@ -170,8 +168,14 @@ namespace ConsoleGameEngine.GameObjects
         {
             if (TextureAtlas == null)
                 throw new NullReferenceException($"The {nameof(TextureAtlas)} must be set to call this method.");
-            Entity.Set(TextureAtlas.Image);
-            Entity.Set(TextureAtlas.CalculateClipping(name));
+            SetImageAndClipping(TextureAtlas.Image, TextureAtlas.CalculateClipping(name));
+        }
+
+        private void SetImageAndClipping(Image image, ClippingInfo clipping)
+        {
+            Entity.Set(image);
+            Entity.Set(clipping);
+            Entity.Set(new EntitySize { Width = clipping.Width, Height = clipping.Height });
         }
 
         /// <summary>

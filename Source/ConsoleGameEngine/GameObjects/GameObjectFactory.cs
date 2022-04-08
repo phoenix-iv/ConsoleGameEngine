@@ -11,9 +11,6 @@ namespace ConsoleGameEngine.GameObjects
     /// </summary>
     public class GameObjectFactory : GameObjectFactoryBase
     {
-        private readonly AnimationManager _animationManager;
-        private readonly CacheManager _cache;
-
         /// <summary>
         /// Creates a neww instance of the <see cref="GameObjectFactory"/>
         /// </summary>
@@ -22,8 +19,7 @@ namespace ConsoleGameEngine.GameObjects
         /// <param name="cache">The cache manager to retreive content from.</param>
         public GameObjectFactory(Scene scene, AnimationManager animationManager, CacheManager cache) : base(scene, animationManager, cache)
         {
-            _animationManager = animationManager;
-            _cache = cache;
+
         }
 
         /// <summary>
@@ -36,7 +32,7 @@ namespace ConsoleGameEngine.GameObjects
         /// <returns>An image game object.</returns>
         public ImageObject Image(string key, float x, float y, bool addToScene = true)
         {
-            Image image = _cache.Images.Get(key);
+            Image image = Cache.Images.Get(key);
             Entity entity = CreateEntity();
             var imageObject = new ImageObject(entity, image);
             imageObject.Position.X = x;

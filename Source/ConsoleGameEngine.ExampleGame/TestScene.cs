@@ -1,6 +1,8 @@
-﻿using ConsoleGameEngine.GameObjects;
+﻿using Box2DX.Common;
+using ConsoleGameEngine.GameObjects;
 using ConsoleGameEngine.Graphics;
-using ConsoleGameEngine.Physics.Arcade.GameObjects;
+using ConsoleGameEngine.Physics.Box2D;
+using ConsoleGameEngine.Physics.Box2D.GameObjects;
 
 namespace ConsoleGameEngine.ExampleGame
 {
@@ -8,8 +10,8 @@ namespace ConsoleGameEngine.ExampleGame
     {
 #nullable disable
         private ImageObject _imageObject;
-        private SpriteWithDynamicBody _sprite;
-        private List<SpriteWithDynamicBody> _sprites = new List<SpriteWithDynamicBody>();
+        private SpriteWithBody _sprite;
+        private readonly List<SpriteWithBody> _sprites = new();
 #nullable enable
 
         public TestScene(Game game) : base(game)
@@ -26,23 +28,29 @@ namespace ConsoleGameEngine.ExampleGame
 
         public override void Create()
         {
-            ArcadePhysics.Start();
+            var config = new Box2dPhysicsConfig
+            {
+                Gravity = Vec2.Zero
+            };
+            Box2dPhysics.Initialize(config);
             _imageObject = Add.Image("test", 0, 0);
             var random = new Random();
-            for (int i = 0; i < 200; i++)
+            for (int i = 0; i < 100; i++)
             {
-                SpriteWithDynamicBody sprite = ArcadePhysics.Add.Sprite("star", random.Next(Console.WindowWidth), random.Next(Console.WindowHeight));
-                sprite.Body.Velocity.X = random.Next(-Console.WindowWidth, Console.WindowWidth);
-                sprite.Body.Velocity.Y = random.Next(-Console.WindowHeight, Console.WindowHeight);
+                SpriteWithBody sprite = Box2dPhysics.Add.Sprite("star", random.Next(Console.WindowWidth), random.Next(Console.WindowHeight));
+                var velocity = new Vec2
+                {
+                    X = random.Next((int)(-Console.WindowWidth * Box2dPhysics.MetersPerChar), (int)(Console.WindowWidth * Box2dPhysics.MetersPerChar)),
+                    Y = random.Next((int)(-Console.WindowHeight * Box2dPhysics.MetersPerChar), (int)(Console.WindowHeight * Box2dPhysics.MetersPerChar))
+                };
+                sprite.Body.SetLinearVelocity(velocity);
                 _sprites.Add(sprite);
             }
-            ArcadePhysics.AddCollisionCheck(_sprites);
-            _sprite = ArcadePhysics.Add.Sprite("test", 0, 0, 0, true);
-            _sprite.Body.Velocity.X = 4;
-            _sprite.Body.Velocity.Y = 2;
-            ArcadePhysics.AddCollisionCheck(_sprite, _sprites);
+            _sprite = Box2dPhysics.Add.Sprite("test", 0, 0, 0);
+            _sprite.Body.SetLinearVelocity(new Vec2(2, -1));
             Animations.Add("test", "test", 0, 4, 10, -1);
             _sprite.PlayAnimation("test");
+            Box2dPhysics.Start();
         }
 
         public override void Update(GameTime time)

@@ -1,7 +1,6 @@
 ﻿using ConsoleGameEngine.Components;
 using ConsoleGameEngine.Graphics;
 using DefaultEcs;
-using System.Drawing;
 
 namespace ConsoleGameEngine.GameObjects
 {
@@ -21,7 +20,7 @@ namespace ConsoleGameEngine.GameObjects
         internal ImageObject(Entity entity, Image image) : base(entity)
         {
             Entity.Set(new Position());
-            Entity.Set(new Size(image.Width, image.Height));
+            Entity.Set(new EntitySize { Width = image.Width, Height = image.Height });
             Entity.Set(new ClippingInfo { X = 0, Y = 0, Height = image.Height, Width = image.Width });
             Entity.Set(image);
         }

@@ -14,7 +14,7 @@
         /// </summary>
         public int Y;
         /// <summary>
-        /// The wkdth of the region.
+        /// The width of the region.
         /// </summary>
         public int Width;
         /// <summary>

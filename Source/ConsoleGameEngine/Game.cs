@@ -33,20 +33,36 @@ namespace ConsoleGameEngine
         /// <summary>
         /// Starts the main game loop.  This is a blocking call and will run until <see cref="Exit"/> is called.
         /// </summary>
-        public void Start()
+        /// <param name="fixedDelta">The fixed delta time between game steps.  Default 1/60th of a second.</param>
+        public void Start(TimeSpan fixedDelta = default)
         {
             Console.CursorVisible = false;
             Scene?.Preload();
             Scene?.Create();
-            var startTime = DateTime.Now;
-            var lastTime = DateTime.Now;
+            if (fixedDelta == default)
+            {
+                fixedDelta = TimeSpan.FromSeconds(1.0 / 60.0);
+            }
+            var currentTime = DateTime.Now;
+            var totalTime = TimeSpan.Zero;
+            var accumulator = TimeSpan.Zero;
 
             while(!_exitRequested)
             {
-                TimeSpan delta = DateTime.Now.Subtract(lastTime);
-                TimeSpan total = DateTime.Now.Subtract(startTime);
-                lastTime = DateTime.Now;
-                Scene?.UpdateInternal(new GameTime { Delta = delta, Total = total });
+                var newTime = DateTime.Now;
+                TimeSpan frameTime = newTime - currentTime;
+                currentTime = newTime;
+
+                accumulator += frameTime;
+
+                while (accumulator >= fixedDelta)
+                {
+                    Scene?.UpdateInternal(new GameTime { Delta = fixedDelta, Total = totalTime });
+                    accumulator -= fixedDelta;
+                    totalTime += fixedDelta;
+                }
+
+                Scene?.Render();
             }
         }
 
