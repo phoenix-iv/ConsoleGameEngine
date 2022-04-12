@@ -12,6 +12,7 @@ namespace ConsoleGameEngine.Systems
     /// </summary>
     internal class RenderSystem : AEntitySetSystem<object?>
     {
+        private readonly Scene _scene;
         private readonly Camera _camera;
         private ColorChar[,] _previousBuffer;
         private int _previousBufferWidth;
@@ -21,10 +22,11 @@ namespace ConsoleGameEngine.Systems
         /// Creates a new instance of the <see cref="RenderSystem"/>.
         /// </summary>
         /// <param name="world">The ECS world the system uses.</param>
-        /// <param name="camera">The camera used to transform the view.</param>
-        public RenderSystem(World world, Camera camera) : base(world.GetEntities().With<Position>().With<ClippingInfo>().With<Image>().AsSet())
+        /// <param name="scene">The scene.</param>
+        public RenderSystem(World world, Scene scene) : base(world.GetEntities().With<Position>().With<ClippingInfo>().With<Image>().AsSet())
         {
-            _camera = camera;
+            _scene = scene;
+            _camera = scene.Camera;
             _previousBufferWidth = Console.WindowWidth;
             _previousBufferHeight = Console.WindowHeight;
             _previousBuffer = new ColorChar[Console.WindowWidth, Console.WindowHeight];
@@ -110,7 +112,7 @@ namespace ConsoleGameEngine.Systems
             _previousBuffer = buffer;
         }
 
-        private static void FullRender(ColorChar[,] buffer, int bufferWidth, int bufferHeight)
+        private void FullRender(ColorChar[,] buffer, int bufferWidth, int bufferHeight)
         {
             // Console window size changed, skip this render
             if (bufferWidth != Console.WindowWidth || bufferHeight != Console.WindowHeight)
@@ -138,7 +140,7 @@ namespace ConsoleGameEngine.Systems
             }
         }
 
-        private static void PartialRender(Dictionary<Point, ColorChar> bufferDiff)
+        private void PartialRender(Dictionary<Point, ColorChar> bufferDiff)
         {
             foreach (var kvp in bufferDiff)
             {
@@ -150,12 +152,13 @@ namespace ConsoleGameEngine.Systems
             }
         }
 
-        private static void RenderChar(int x, int y, ColorChar c)
+        private void RenderChar(int x, int y, ColorChar c)
         {
             if (c.Char == '\0')
                 c.Char = ' ';
             Console.SetCursorPosition(x, y);
-            Console.ForegroundColor = c.Color;
+            Console.BackgroundColor = c.BackColor ?? _scene.DefaultBackgroundColor;
+            Console.ForegroundColor = c.ForeColor;
             Console.Write(c.Char);
         }
 

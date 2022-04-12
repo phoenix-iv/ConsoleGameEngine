@@ -33,6 +33,7 @@ namespace ConsoleGameEngine.ExampleGame
                 Gravity = Vec2.Zero
             };
             Box2dPhysics.Initialize(config);
+            DefaultBackgroundColor = ConsoleColor.DarkBlue;
             _imageObject = Add.Image("test", 0, 0);
             var random = new Random();
             for (int i = 0; i < 100; i++)

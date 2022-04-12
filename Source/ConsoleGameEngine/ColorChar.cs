@@ -1,24 +1,22 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace ConsoleGameEngine
+﻿namespace ConsoleGameEngine
 {
     /// <summary>
-    /// A color/character pair.  Acts as a text "pixel".
+    /// A foreground color, background color, character triplet.  Acts as a text "pixel".
     /// </summary>
     public struct ColorChar : IEquatable<ColorChar>
     {
+        /// <summary>
+        /// The background color.
+        /// </summary>
+        public ConsoleColor? BackColor;
         /// <summary>
         /// The character.
         /// </summary>
         public char Char;
         /// <summary>
-        /// The color.
+        /// The foreground color.
         /// </summary>
-        public ConsoleColor Color;
+        public ConsoleColor ForeColor;
 
         /// <summary>
         /// Determines if this equals the other object.
@@ -38,7 +36,8 @@ namespace ConsoleGameEngine
         public bool Equals(ColorChar other)
         {
             return Char == other.Char &&
-                   Color == other.Color;
+                   ForeColor == other.ForeColor &&
+                   BackColor == other.BackColor;
         }
 
         /// <summary>
@@ -47,7 +46,7 @@ namespace ConsoleGameEngine
         /// <returns>A hash code for this object.</returns>
         public override int GetHashCode()
         {
-            return HashCode.Combine(Char, Color);
+            return HashCode.Combine(Char, ForeColor, BackColor);
         }
 
         /// <summary>

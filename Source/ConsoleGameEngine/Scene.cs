@@ -35,6 +35,10 @@ namespace ConsoleGameEngine
         /// </summary>
         public IReadOnlyList<GameObject> Children => _children;
         /// <summary>
+        /// The default background color for the scene.
+        /// </summary>
+        public ConsoleColor DefaultBackgroundColor { get; set; } = ConsoleColor.Black;
+        /// <summary>
         /// The game that this scene is a part of.
         /// </summary>
         public Game Game { get; }
@@ -48,7 +52,7 @@ namespace ConsoleGameEngine
         public World World { get; }
 
         private SequentialSystem<GameTime> _updatePipeline;
-        private SequentialSystem<object?> _renderPipeline;
+        private readonly SequentialSystem<object?> _renderPipeline;
 
         /// <summary>
         /// Creates a new instance of <see cref="Scene"/>.
@@ -84,7 +88,7 @@ namespace ConsoleGameEngine
         }
         
         /// <summary>
-        /// Injects the specified physics systems into the update system pipeline.
+        /// Injects the specified physics systems into the update pipeline system.
         /// </summary>
         /// <param name="physicsSystems">The physics systems to include in the update pipeline.</param>
         public void InjectPhysicsSystems(IEnumerable<ISystem<GameTime>>? physicsSystems)
@@ -152,7 +156,7 @@ namespace ConsoleGameEngine
 
         private SequentialSystem<object?> BuildRenderPipeline()
         {
-            return new SequentialSystem<object?>(new RenderSystem(World, Camera));
+            return new SequentialSystem<object?>(new RenderSystem(World, this));
         }
 
         private SequentialSystem<GameTime> BuildUpdatePipeline(IEnumerable<ISystem<GameTime>>? physicsSystems = null)

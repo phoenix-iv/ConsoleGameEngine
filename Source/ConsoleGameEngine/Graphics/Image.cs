@@ -56,33 +56,39 @@
             for (int y = 0; y < strings.Length; y++)
             {
                 data[y] = new ColorChar[width];
-                for(int x = 0; x < strings[y].Length; x += 2)
+                for(int x = 0; x < strings[y].Length; x += 3)
                 {
-                    var color = strings[y][x + 1] switch
-                    {
-                        '0' => ConsoleColor.Black,
-                        '1' => ConsoleColor.DarkBlue,
-                        '2' => ConsoleColor.DarkGreen,
-                        '3' => ConsoleColor.DarkCyan,
-                        '4' => ConsoleColor.DarkRed,
-                        '5' => ConsoleColor.DarkMagenta,
-                        '6' => ConsoleColor.DarkYellow,
-                        '7' => ConsoleColor.Gray,
-                        '8' => ConsoleColor.DarkGray,
-                        '9' => ConsoleColor.Blue,
-                        'a' or 'A' => ConsoleColor.Green,
-                        'b' or 'B' => ConsoleColor.Cyan,
-                        'c' or 'C' => ConsoleColor.Red,
-                        'd' or 'D' => ConsoleColor.Magenta,
-                        'e' or 'E' => ConsoleColor.Yellow,
-                        'f' or 'F' => ConsoleColor.White,
-                        _ => ConsoleColor.Black
-                    };
-                    data[y][x / 2] = new ColorChar { Char = strings[y][x], Color = color };
+                    ConsoleColor? foreColor = CharToColor(strings[y][x + 1]);
+                    ConsoleColor? backColor = CharToColor(strings[y][x + 2]);
+                    data[y][x / 3] = new ColorChar { Char = strings[y][x], ForeColor = foreColor ?? ConsoleColor.Black, BackColor = backColor };
                 }
             }
 
             Data = data;
+        }
+
+        private static ConsoleColor? CharToColor(char c)
+        {
+            return c switch
+            {
+                '0' => ConsoleColor.Black,
+                '1' => ConsoleColor.DarkBlue,
+                '2' => ConsoleColor.DarkGreen,
+                '3' => ConsoleColor.DarkCyan,
+                '4' => ConsoleColor.DarkRed,
+                '5' => ConsoleColor.DarkMagenta,
+                '6' => ConsoleColor.DarkYellow,
+                '7' => ConsoleColor.Gray,
+                '8' => ConsoleColor.DarkGray,
+                '9' => ConsoleColor.Blue,
+                'a' or 'A' => ConsoleColor.Green,
+                'b' or 'B' => ConsoleColor.Cyan,
+                'c' or 'C' => ConsoleColor.Red,
+                'd' or 'D' => ConsoleColor.Magenta,
+                'e' or 'E' => ConsoleColor.Yellow,
+                'f' or 'F' => ConsoleColor.White,
+                _ => (ConsoleColor?)null
+            };
         }
 
         private void CalculateSize()
