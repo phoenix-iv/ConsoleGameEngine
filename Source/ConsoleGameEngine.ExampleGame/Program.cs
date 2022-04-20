@@ -3,5 +3,5 @@ using ConsoleGameEngine;
 using ConsoleGameEngine.ExampleGame;
 
 using var game = new Game();
-game.Scene = new TestScene(game);
-game.Start();
+var scene = new TestScene(game);
+game.Start(scene);

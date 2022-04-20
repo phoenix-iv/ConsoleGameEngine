@@ -17,9 +17,9 @@ namespace ConsoleGameEngine
         /// </summary>
         public CacheManager Cache { get; } = new CacheManager();
         /// <summary>
-        /// The scene to run.
+        /// The scene manager.
         /// </summary>
-        public Scene? Scene { get; set; }
+        public SceneManager Scenes { get; }
         private bool _exitRequested = false;
 
         /// <summary>
@@ -28,17 +28,18 @@ namespace ConsoleGameEngine
         public Game()
         {
             Animations = new AnimationManager(Cache);
+            Scenes = new SceneManager();
         }
 
         /// <summary>
         /// Starts the main game loop.  This is a blocking call and will run until <see cref="Exit"/> is called.
         /// </summary>
-        /// <param name="fixedDelta">The fixed delta time between game steps.  Default 1/60th of a second.</param>
-        public void Start(TimeSpan fixedDelta = default)
+        /// <param name="initialScene">The initial scene to load up.</param>
+        /// <param name="fixedDelta">The fixed delta time between update steps.  Default 1/60th of a second.</param>
+        public void Start(Scene initialScene, TimeSpan fixedDelta = default)
         {
             Console.CursorVisible = false;
-            Scene?.Preload();
-            Scene?.Create();
+            Scenes.SwitchTo(initialScene);
             if (fixedDelta == default)
             {
                 fixedDelta = TimeSpan.FromSeconds(1.0 / 60.0);
@@ -57,12 +58,13 @@ namespace ConsoleGameEngine
 
                 while (accumulator >= fixedDelta)
                 {
-                    Scene?.UpdateInternal(new GameTime { Delta = fixedDelta, Total = totalTime });
+                    if (!Scenes.CurrentScene?.IsShutDown ?? false)
+                        Scenes.CurrentScene?.UpdateInternal(new GameTime { Delta = fixedDelta, Total = totalTime });
                     accumulator -= fixedDelta;
                     totalTime += fixedDelta;
                 }
 
-                Scene?.Render();
+                Scenes.CurrentScene?.Render();
             }
         }
 

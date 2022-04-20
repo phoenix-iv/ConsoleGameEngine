@@ -39,6 +39,14 @@ namespace ConsoleGameEngine
         /// </summary>
         public ConsoleColor DefaultBackgroundColor { get; set; } = ConsoleColor.Black;
         /// <summary>
+        /// Whether or not the scene is in the processs of shutting down.
+        /// </summary>
+        public bool IsShuttingDown => _shutdownRequested;
+        /// <summary>
+        /// Whether or not this scene has been shut down.
+        /// </summary>
+        public bool IsShutDown { get; private set; }
+        /// <summary>
         /// The game that this scene is a part of.
         /// </summary>
         public Game Game { get; }
@@ -52,6 +60,7 @@ namespace ConsoleGameEngine
         public World World { get; }
 
         private SequentialSystem<GameTime> _updatePipeline;
+        private bool _shutdownRequested;
         private readonly SequentialSystem<object?> _renderPipeline;
 
         /// <summary>
@@ -116,16 +125,38 @@ namespace ConsoleGameEngine
 
         internal void UpdateInternal(GameTime time)
         {
-            Update(time);
-            _updatePipeline.Update(time);
+            if (IsShutDown)
+                throw new InvalidOperationException($"You cannot run {nameof(UpdateInternal)} on a scene that has been shut down.");
+
+            if (!_shutdownRequested)
+            {
+                Update(time);
+                _updatePipeline.Update(time);
+            }
+
+            if (_shutdownRequested)
+            {
+                ShutDown();
+                Box2dPhysics.World.Dispose();
+                World.Dispose();
+                IsShutDown = true;
+            }
         }
 
         /// <summary>
         /// When overridden, performs any tasks needed to shutdown a scene.
         /// </summary>
-        public virtual void Shutdown()
+        public virtual void ShutDown()
         {
 
+        }
+
+        /// <summary>
+        /// Starts the shutdown process for this scene.
+        /// </summary>
+        public void StartShutdown()
+        {
+            _shutdownRequested = true;
         }
 
         /// <summary>
