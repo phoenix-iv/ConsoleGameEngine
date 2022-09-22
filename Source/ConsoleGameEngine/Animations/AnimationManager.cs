@@ -415,12 +415,17 @@ namespace ConsoleGameEngine.Animations
         /// Stops the specified animation on the specified target.
         /// </summary>
         /// <param name="target">The target that is currently playing the animation.</param>
-        public void Stop(IAnimationTarget target)
+        /// <param name="rewind">Whether or not to rewind the animation back to the first frame.</param>
+        public void Stop(IAnimationTarget target, bool rewind = false)
         {
             if (target.CurrentAnimation == null)
                 return;
             Animation animation = target.CurrentAnimation.Value;
             animation.IsStopped = true;
+            if (rewind)
+            {
+                animation.FrameIndex = 0;
+            }
             target.CurrentAnimation = animation;
         }
 
