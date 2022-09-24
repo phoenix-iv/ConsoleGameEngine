@@ -101,8 +101,7 @@ namespace ConsoleGameEngine.GameObjects
             T sprite = AddSprite<T>(x, y, addToScene);
             TextureAtlas atlas = Cache.TextureAtlases.Get(textureAtlasKey);
             sprite.InitializeTextureAtlas(atlas);
-            if (initialFrame == null)
-                initialFrame = atlas.Frames.First().FileName;
+            initialFrame ??= atlas.Frames.First().FileName;
             sprite.SetFrame(initialFrame);
             return sprite;
         }

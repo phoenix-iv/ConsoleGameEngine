@@ -1,0 +1,21 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:drawable="clr-namespace:ConsoleGameEngine.Tools.ImageEditor"
+             x:Class="ConsoleGameEngine.Tools.ImageEditor.MainPage">
+
+    <ContentPage.Resources>
+        <drawable:ImageDrawer x:Key="drawable" />
+    </ContentPage.Resources>
+
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*" />
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+        <GraphicsView Grid.Row="0" x:Name="GraphicsView" Drawable="{StaticResource drawable}" StartHoverInteraction="GraphicsView_StartHoverInteraction" 
+                     MoveHoverInteraction="GraphicsView_MoveHoverInteraction" EndHoverInteraction="GraphicsView_EndHoverInteraction" />
+        <Button Grid.Row="1" Clicked="Button_Clicked" Text="Redraw" WidthRequest="100" />
+    </Grid>
+
+</ContentPage>

@@ -64,16 +64,32 @@ namespace ConsoleGameEngine.ExampleGame
                     Game.Exit();
 
                 if (keyInfo.Key == ConsoleKey.RightArrow)
-                    _sprite.Position.X += 1;
+                {
+                    Vec2 p = _sprite.Body.GetPosition();
+                    p.X += Box2dPhysics.MetersPerChar;
+                    _sprite.Body.SetPosition(p);
+                }
 
                 if (keyInfo.Key == ConsoleKey.LeftArrow)
-                    _sprite.Position.X -= 1;
+                {
+                    Vec2 p = _sprite.Body.GetPosition();
+                    p.X -= Box2dPhysics.MetersPerChar;
+                    _sprite.Body.SetPosition(p);
+                }
 
                 if (keyInfo.Key == ConsoleKey.UpArrow)
-                    _sprite.Position.Y -= 1;
+                {
+                    Vec2 p = _sprite.Body.GetPosition();
+                    p.Y += Box2dPhysics.MetersPerChar;
+                    _sprite.Body.SetPosition(p);
+                }
 
                 if (keyInfo.Key == ConsoleKey.DownArrow)
-                    _sprite.Position.Y += 1;
+                {
+                    Vec2 p = _sprite.Body.GetPosition();
+                    p.Y -= Box2dPhysics.MetersPerChar;
+                    _sprite.Body.SetPosition(p);
+                }
             }
         }
     }

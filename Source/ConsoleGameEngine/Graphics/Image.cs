@@ -87,7 +87,7 @@
                 'd' or 'D' => ConsoleColor.Magenta,
                 'e' or 'E' => ConsoleColor.Yellow,
                 'f' or 'F' => ConsoleColor.White,
-                _ => (ConsoleColor?)null
+                _ => null
             };
         }
 
