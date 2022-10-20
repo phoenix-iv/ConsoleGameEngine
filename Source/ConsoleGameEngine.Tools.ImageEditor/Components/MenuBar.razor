@@ -1,0 +1,21 @@
+﻿<nav class="navbar navbar-expand-lg bg-light">
+  <div class="container-fluid">
+    <button class="navbar-toggler" type="button" aria-controls="menuBar" aria-expanded="@(!_collapseMenuBar)" aria-label="Toggle Menu Bar" @onclick="ToggleMenuBar">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="@MenuBarCssClass navbar-collapse" id="menuBar">
+      <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+        <li class="nav-item dropdown">
+          <a class="nav-link dropdown-toggle" href="#" role="button" aria-expanded="@(!_collapseFileMenu)" @onclick="ToggleFileMenu">
+            File
+          </a>
+          <ul class="dropdown-menu @FileMenuCssClass" @onclick="ToggleFileMenu">
+            <li><a class="dropdown-item" href="#" @onclick="FileOpenMenuClick">Open</a></li>
+            <li><a class="dropdown-item" href="#" @onclick="FileSaveMenuClick">Save</a></li>
+            <li><a class="dropdown-item" href="#" @onclick="FileSaveAsMenuClick">Save As</a></li>
+          </ul>
+        </li>
+      </ul>
+    </div>
+  </div>
+</nav>

@@ -1,29 +1,36 @@
-﻿namespace ConsoleGameEngine.Tools.ImageEditor
+﻿using System;
+
+namespace ConsoleGameEngine.Tools.ImageEditor
 {
     internal static class ConsoleColorConvert
     {
-        public static Color ToMauiColor(ConsoleColor consoleColor)
+        public static string ToHexColor(ConsoleColor color)
         {
-            return consoleColor switch
+            return color switch
             {
-                ConsoleColor.Black => Colors.Black,
-                ConsoleColor.DarkBlue => Color.FromArgb("000080"),
-                ConsoleColor.DarkGreen => Color.FromArgb("008000"),
-                ConsoleColor.DarkCyan => Color.FromArgb("008080"),
-                ConsoleColor.DarkRed => Color.FromArgb("800000"),
-                ConsoleColor.DarkMagenta => Color.FromArgb("800080"),
-                ConsoleColor.DarkYellow => Color.FromArgb("808000"),
-                ConsoleColor.Gray => Color.FromArgb("C0C0C0"),
-                ConsoleColor.DarkGray => Color.FromArgb("808080"),
-                ConsoleColor.Blue => Color.FromArgb("0000FF"),
-                ConsoleColor.Green => Color.FromArgb("00FF00"),
-                ConsoleColor.Cyan => Color.FromArgb("00FFFF"),
-                ConsoleColor.Red => Color.FromArgb("FF0000"),
-                ConsoleColor.Magenta => Color.FromArgb("FF00FF"),
-                ConsoleColor.Yellow => Color.FromArgb("FFFF00"),
-                ConsoleColor.White => Colors.White,
-                _ => Colors.Black
+                ConsoleColor.Black => "000000",
+                ConsoleColor.DarkBlue => "000080",
+                ConsoleColor.DarkGreen => "008000",
+                ConsoleColor.DarkCyan => "008080",
+                ConsoleColor.DarkRed => "800000",
+                ConsoleColor.DarkMagenta => "800080",
+                ConsoleColor.DarkYellow => "808000",
+                ConsoleColor.Gray => "C0C0C0",
+                ConsoleColor.DarkGray => "808080",
+                ConsoleColor.Blue => "0000FF",
+                ConsoleColor.Green => "00FF00",
+                ConsoleColor.Cyan => "00FFFF",
+                ConsoleColor.Red => "FF0000",
+                ConsoleColor.Magenta => "FF00FF",
+                ConsoleColor.Yellow => "FFFF00",
+                ConsoleColor.White => "FFFFFF",
+                _ => "000000"
             };
+        }
+
+        public static Color ToMauiColor(ConsoleColor color)
+        {
+            return Color.FromArgb(ToHexColor(color));
         }
     }
 }

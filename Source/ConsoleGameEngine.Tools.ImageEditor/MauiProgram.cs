@@ -1,4 +1,6 @@
-﻿namespace ConsoleGameEngine.Tools.ImageEditor
+﻿using Microsoft.AspNetCore.Components.WebView.Maui;
+
+namespace ConsoleGameEngine.Tools.ImageEditor
 {
     public static class MauiProgram
     {
@@ -10,9 +12,12 @@
                 .ConfigureFonts(fonts =>
                 {
                     fonts.AddFont("OpenSans-Regular.ttf", "OpenSansRegular");
-                    fonts.AddFont("OpenSans-Semibold.ttf", "OpenSansSemibold");
-                    fonts.AddFont("CONSOLA.TTF", "Consolas");
                 });
+
+            builder.Services.AddMauiBlazorWebView();
+#if DEBUG
+		builder.Services.AddBlazorWebViewDeveloperTools();
+#endif
 
             return builder.Build();
         }
